@@ -24,7 +24,7 @@ The project demonstrates a full-stack microservice-based architecture, combining
 | **Frontend** | **Vanilla TypeScript**, **Tailwind CSS**, **Babylon.js** | SPA for UI, dynamic routing, and 3D game rendering |
 | **Backend** | **Fastify**, **WebSocket** | Handles API routes, authentication, and real-time communication |
 | **Infrastructure** | **Docker**, **Makefile** | Automates build, run, and cleanup for microservices |
-| **Database** | (Your DB choice here, e.g. PostgreSQL, MySQL, etc.) | Persistent user and match data |
+| **Database** | **SQLite** | Persistent user and match data |
 | **Game Engine** | **Babylon.js** | Real-time 3D Pong gameplay (AI, Local, Remote modes) |
 
 ---
