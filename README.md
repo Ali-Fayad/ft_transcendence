@@ -148,14 +148,6 @@ ft_transcendence/
 
 ---
 
-## 🧠 Authors
-
-* **Ali [@yourusername]** – Frontend lead
-* **[Your teammates’ names]** – Backend, design, or infrastructure
-
-Special thanks to **our instructors and mentors** for their guidance throughout the project 💚
-
----
 
 ## 🏁 Notes
 
