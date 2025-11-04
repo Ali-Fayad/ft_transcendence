@@ -1,45 +1,168 @@
-# 🎮 ft_transcendence
+# 🕹️ ft_transcendence
 
-> The final project at **42** — a full-stack web application combining modern web technologies, real-time multiplayer gameplay, and secure authentication — all built from scratch.
-
----
-
-## 🧠 Overview
-
-**ft_transcendence** is a modern **Single Page Application (SPA)** where users can:
-- **Register, log in, and manage their profiles**
-- **Play an interactive 3D Pong game** against AI, local players, or online opponents
-- **Chat and add friends**
-- **Join tournaments**
-- **Customize their settings and language preferences**
-
-The project demonstrates a full-stack microservice-based architecture, combining both **frontend and backend** technologies with **real-time WebSocket communication** — all containerized using **Docker**.
+**ft_transcendence** is the final project of the 42 Common Core — a full-stack web application built around a real-time multiplayer **Pong game**, including authentication, chat, friend system, and tournaments.
+This project is designed to combine **frontend, backend, and DevOps** skills into a single cohesive platform.
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Features
 
-| Layer | Technology | Description |
-|:------|:------------|:-------------|
-| **Frontend** | **Vanilla TypeScript**, **Tailwind CSS**, **Babylon.js** | SPA for UI, dynamic routing, and 3D game rendering |
-| **Backend** | **Fastify**, **WebSocket** | Handles API routes, authentication, and real-time communication |
-| **Infrastructure** | **Docker**, **Makefile** | Automates build, run, and cleanup for microservices |
-| **Database** | **SQLite** | Persistent user and match data |
-| **Game Engine** | **Babylon.js** | Real-time 3D Pong gameplay (AI, Local, Remote modes) |
+* 🎮 **Real-time Pong Game**
+
+  * Local play (same device)
+  * Remote multiplayer (1v1 or 3v3)
+  * AI opponent
+
+* 💬 **Friend System & Chat**
+
+  * Add, remove, or invite friends
+  * Direct messaging and live conversations
+
+* 🏆 **Tournaments**
+
+  * 4 or 8-player brackets
+  * Automated match progression
+
+* ⚙️ **User Settings**
+
+  * Multi-language support
+  * Profile customization
+  * Two-factor authentication (2FA)
+
+* 🔐 **Authentication System**
+
+  * Google OAuth2
+  * Email verification
+  * Password reset
+  * Secure session management
 
 ---
 
-## ⚙️ Installation
+## 🧩 Tech Stack
 
-### 1️⃣ Prerequisites
+| Layer              | Technology                         |
+| :----------------- | :--------------------------------- |
+| **Frontend**       | TypeScript / TailwindCSS           |
+| **Backend**        | Fastif.js / Node.js                |
+| **Database**       | SQLite                             |
+| **Authentication** | OAuth2 / JWT / 2FA                 |
+| **Deployment**     | Docker / Nginx / Makefile          |
+| **Launcher**       | Custom `start.sh` interactive menu |
+
+---
+
+## 🛠️ Setup
+
 Make sure you have the following installed:
-- **Docker** and **Docker Compose**
-- **Node.js (≥ 18)** and **npm**
-- **Make**
+
+* Docker & Docker Compose
+* Make
+* Bash (for `start.sh`)
+* Node.js and npm (if you want to run locally without Docker)
+
+Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/ft_transcendence.git
+cd ft_transcendence
+```
 
 ---
 
-### 2️⃣ Clone the Repository
+## ▶️ Run the Project
+
+The project provides a **custom interactive launcher**:
+
 ```bash
-git clone https://github.com/<your-username>/ft_transcendence.git
-cd ft_transcendence
+./start.sh
+```
+
+From there, you can:
+
+* 🟢 **Run** the full stack (frontend + backend + database)
+* 🧱 **Build** everything from scratch
+* 🧹 **Clean** containers, images, and volumes
+* 🧩 **Debug** the stack (runs with logs enabled)
+
+Alternatively, you can use `make` directly:
+
+```bash
+make up       # Run services
+make build    # Build containers
+make down     # Stop services
+make fclean   # Full cleanup
+```
+
+---
+
+## 🐞 Debug Mode
+
+You can start the app in **debug mode** directly using:
+
+```bash
+./start.sh debug
+```
+
+This enables verbose logging for both backend and frontend, helpful during development.
+
+---
+
+## 🔍 Project Structure
+
+```
+ft_transcendence/
+├── backend/           # FastifyJS backend
+├── frontend/          # TypeScript frontend
+├── database/          # Database config, migrations, seeds
+├── Makefile           # Main build & run logic
+├── start.sh           # Interactive launcher
+├── .env               # Environment variables (not exposed)
+└── README.md
+```
+
+---
+
+## 🧪 Evaluation / Testing
+
+**Evaluator quick guide:**
+
+| Task                 | Command                   |
+| :------------------- | :------------------------ |
+| Build all containers | `make build`              |
+| Run the app          | `make up` or `./start.sh` |
+| Access frontend      | `http://localhost:5173`   |
+| Access backend       | `http://localhost:8080`   |
+| Clean everything     | `make fclean`             |
+
+---
+
+## 📸 Screenshots / Demo
+
+> *(You can add images or GIFs here)*
+> Example:
+>
+> ```
+> ![Home Page](assets/home.png)
+> ![Game Preview](assets/game.gif)
+> ```
+
+---
+
+## 🧠 Authors
+
+* **Ali [@yourusername]** – Frontend lead
+* **[Your teammates’ names]** – Backend, design, or infrastructure
+
+Special thanks to **our instructors and mentors** for their guidance throughout the project 💚
+
+---
+
+## 🏁 Notes
+
+* The project follows 42 standards and best practices.
+* All scripts are designed to work out-of-the-box inside the 42 environment.
+* For any local development, ensure `.env` is properly set.
+
+---
+
+**🎉 ft_transcendence – Beyond the game, it’s a full stack journey.**
