@@ -1,0 +1,342 @@
+services:
+  user_management:
+    build:
+      context: ./Backend/user-management
+      dockerfile: Dockerfile
+    container_name: user_management
+    hostname: user_management
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${USER_MANAGEMENT_PORT}
+      DB_FILE: ${USER_MANAGEMENT_DB_FILE}
+      MAILER_URL: ${MAILER_URL}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - user_data:/app/data
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/user-management:/app/certs:ro
+    ports:
+      - "3001:3000"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3000/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=user-management"
+      - "com.transcendence.tier=core"
+
+  socket_microservice:
+    build:
+      context: ./Backend/socket-microservice
+      dockerfile: Dockerfile
+    container_name: socket_microservice
+    hostname: socket_microservice
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${SOCKET_PORT}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      HEARTBEAT_MS: ${HEARTBEAT_MS}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/socket-microservice:/app/certs:ro
+    ports:
+      - "3005:3005"
+    networks:
+      - backend
+    depends_on:
+      user_management:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3005/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=socket"
+      - "com.transcendence.tier=realtime"
+
+  game_microservice:
+    build:
+      context: ./Backend/game-microservice
+      dockerfile: Dockerfile
+    container_name: game_microservice
+    hostname: game_microservice
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${GAME_PORT}
+      DB_FILE: ${GAME_DB_FILE}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - game_data:/app/data
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/game-microservice:/app/certs:ro
+    ports:
+      - "3004:3000"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3000/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=game"
+      - "com.transcendence.tier=core"
+
+  mailer:
+    build:
+      context: ./Backend/mailer-microservice
+      dockerfile: Dockerfile
+    container_name: mailer
+    hostname: mailer
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${MAILER_PORT}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_SECURE: "${SMTP_SECURE}"
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      FROM_EMAIL: ${FROM_EMAIL}
+      FROM_NAME: ${FROM_NAME}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/mailer-microservice:/app/certs:ro
+    ports:
+      - "3002:3000"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3000/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=mailer"
+      - "com.transcendence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.tier=communication"
+
+  session_microservice:
+    build:
+      context: ./Backend/session-microservice
+      dockerfile: Dockerfile
+    container_name: session_microservice
+    hostname: session_microservice
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${SESSION_PORT}
+      DB_FILE: ${SESSION_DB_FILE}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - session_data:/app/data
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/session-microservice:/app/certs:ro
+    ports:
+      - "3003:3000"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3000/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=session"
+      - "com.transcendence.tier=core"
+
+  google_oauth2:
+    build:
+      context: ./Backend/google-oauth2
+      dockerfile: Dockerfile
+    container_name: google_oauth2
+    hostname: google_oauth2
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${GOOGLE_PORT}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      AUTH_JWT_TTL: "${AUTH_JWT_TTL}"
+      STATE_SECRET: ${STATE_SECRET}
+      ALLOWED_REDIRECTS: ${ALLOWED_REDIRECTS}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/google-oauth2:/app/certs:ro
+    ports:
+      - "3006:3000"
+    networks:
+      - backend
+    depends_on:
+      user_management:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3000/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=oauth"
+      - "com.transcendence.tier=auth"
+
+  realtime_microservice:
+    build:
+      context: ./Backend/realtime-microservice
+      dockerfile: Dockerfile
+    container_name: realtime_microservice
+    hostname: realtime_microservice
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${REALTIME_PORT}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/realtime-microservice:/app/certs:ro
+    ports:
+      - "3020:3020"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:3020/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=realtime"
+      - "com.transcendence.tier=realtime"
+
+  api_gateway:
+    build:
+      context: ./Backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    hostname: api_gateway
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${API_GATEWAY_PORT}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      SESSION_SERVICE_URL: ${SESSION_SERVICE_URL}
+      GAME_SERVICE_URL: ${GAME_SERVICE_URL}
+      GOOGLE_OAUTH_URL: ${GOOGLE_OAUTH_URL}
+      SOCKET_URL: ${SOCKET_URL}
+      REALTIME_URL: ${REALTIME_URL}
+      MAILER_URL: ${MAILER_URL}
+      CORS_ORIGIN: "${CORS_ORIGIN}"
+      UPSTREAM_TIMEOUT_MS: ${UPSTREAM_TIMEOUT_MS}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      AUTH_JWT_TTL: "${AUTH_JWT_TTL}"
+      ENABLE_HTTPS: "${ENABLE_HTTPS}"
+      CERT_PATH: ${CERT_PATH}
+      NODE_EXTRA_CA_CERTS: ${NODE_EXTRA_CA_CERTS}
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/usr/local/share/ca-certificates/transcendence-ca.crt:ro
+      - ./Backend/certs/services/api-gateway:/app/certs:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      user_management:
+        condition: service_healthy
+      session_microservice:
+        condition: service_healthy
+      game_microservice:
+        condition: service_healthy
+      mailer:
+        condition: service_healthy
+      google_oauth2:
+        condition: service_healthy
+      socket_microservice:
+        condition: service_healthy
+      realtime_microservice:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('https').get('https://localhost:8080/health',{rejectUnauthorized:false},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=api-gateway"
+      - "com.transcendence.tier=gateway"
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    hostname: frontend
+    volumes:
+      - ./Backend/certs/ca/ca.crt:/etc/nginx/ca/ca.crt:ro
+      - ./Backend/certs/services/frontend:/etc/nginx/certs:ro
+    ports:
+      - "5173:443"
+    networks:
+      - backend
+    depends_on:
+      api_gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate https://localhost/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    labels:
+      - "com.transcendence.service=frontend"
+      - "com.transcendence.tier=presentation"
+
+networks:
+  backend:
+    driver: bridge
+    name: transcendence_network
+
+volumes:
+  user_data:
+    driver: local
+    name: transcendence_user_data
+  game_data:
+    driver: local
+    name: transcendence_game_data
+  session_data:
+    driver: local
+    name: transcendence_session_data
+
